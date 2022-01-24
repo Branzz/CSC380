@@ -1,6 +1,9 @@
 package com.wordpress.brancodes.main;
 
+import java.awt.*;
 public class Data {
+
+	public final static boolean PRINT_NODES = false;
 
 	public final static int SIZE = 3;
 
@@ -9,6 +12,14 @@ public class Data {
 			{ 8, 0, 4 },
 			{ 7, 6, 5 }
 	};
+
+	public final static Point[] GOAL_POINTS = new Point[SIZE * SIZE];
+
+	static {
+		for (int i = 0; i < SIZE; i++)
+			for (int j = 0; j < SIZE; j++)
+				GOAL_POINTS[GOAL[i][j]] = new Point(j, i); // p[i] is where i is on GOAL
+	}
 
 	public static final int[][][] BOARD_CONFIGS = new int[][][] {
 			{{ 1, 3, 4 },

@@ -1,7 +1,7 @@
 package com.wordpress.brancodes.searcher;
 
 /**
- * Store final data from a search.
+ * store final data from a search.
  */
 public record SearchStats(int length, int cost, int time, int space) {
 

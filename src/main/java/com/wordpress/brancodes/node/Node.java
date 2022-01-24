@@ -5,27 +5,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wordpress.brancodes.main.Data.GOAL;
-import static com.wordpress.brancodes.main.Data.SIZE;
+import static com.wordpress.brancodes.main.Data.*;
+import static java.lang.Math.abs;
 
-public class Node {
+public class Node implements Heuristic {
 
-	private Move moveDirection; // move it took to get to this node
-	private int[][] board; // the state
-	private Node parent;
-	private int depth;
-	private int movedTileCost;
-	private int cost;
-	private int totalCost;
+	private final Move moveDirection; // move it took to get to this node
+	private final int[][] board; // the state
+	private final Node parent;
+	private final int depth;
+	private final int movedTileValue;
+	private final Point zero; // where the space is
 	private List<Node> children;
-	private Point zero; // where the space is
 
-	public Node(int[][] board, Node parent, Move moveDirection, int depth, int movedTileCost) {
+	public Node(int[][] board, Node parent, Move moveDirection, int depth, int movedTileValue) {
 		this.board = board;
 		this.parent = parent;
 		this.moveDirection = moveDirection;
 		this.depth = depth;
-		this.movedTileCost = movedTileCost;
+		this.movedTileValue = movedTileValue;
 		zero = getZero();
 	}
 
@@ -37,7 +35,7 @@ public class Node {
 		children = new ArrayList<>(4); // one index for each direction
 		for (int i = 0; i < Move.values().length; i++) {
 			Move move = Move.values()[i];
-			if (move != moveDirection.opposite // so that it doesn't search backwards up the tree
+			if ((moveDirection == null || move != moveDirection.opposite) // so that it doesn't search backwards up the tree
 				&& move.inBounds(zero)) { // can't move out of bounds pieces in
 				// clone board
 				int[][] modifiedBoard = new int[SIZE][SIZE];
@@ -81,16 +79,42 @@ public class Node {
 		return boardAsInt;
 	}
 
+	public Integer misplacedTiles() {
+		int count = 0;
+		for (int i = 0; i < SIZE; i++)
+			for (int j = 0; j < SIZE; j++)
+				if (GOAL[i][j] != board[i][j])
+					count++;
+		return count;
+	}
+
+	public Integer manhattanSum() {
+		int manhattanSum = 0;
+		for (int i = 0; i < SIZE; i++)
+			for (int j = 0; j < SIZE; j++)
+				if (board[i][j] != 0) // don't include manhattan distance of the empty tile
+					manhattanSum += abs(GOAL_POINTS[board[i][j]].y - i) + abs(GOAL_POINTS[board[i][j]].x - j);
+		return manhattanSum;
+	}
+
+	public Integer manhattanSumByValue() {
+		return manhattanSum() * movedTileValue;
+	}
+
 	public int[][] getBoard() {
 		return board;
+	}
+
+	public Node getParent() {
+		return parent;
 	}
 
 	public int getDepth() {
 		return depth;
 	}
 
-	public int getCost() {
-		return movedTileCost;
+	public int getTileValue() {
+		return movedTileValue;
 	}
 
 	public List<Node> getChildren() {
@@ -101,25 +125,40 @@ public class Node {
 		return children != null;
 	}
 
-	/**
-	 * f(n)
-	 */
+	private int evaluationCost;
+	private int pathCost;
+	private int goalCost;
+
+	/** f(n) */
+	@Override
 	public int evaluationFunction() {
-		return 0;
+		return evaluationCost;
 	}
 
-	/**
-	 * g(n)
-	 */
+	/** g(n) */
+	@Override
 	public int costFunction() {
-		return 0;
+		return getTileValue();
 	}
 
-	/**
-	 * h(n)
-	 */
+	/** h(n) */
+	@Override
 	public int heuristicFunction() {
-		return 0;
+		return goalCost;
+	}
+
+	// to be set by the (informed) searcher
+
+	public void setEvaluationCost(final int evaluationCost) {
+		this.evaluationCost = evaluationCost;
+	}
+
+	public void setPathCost(final int pathCost) {
+		this.pathCost = pathCost;
+	}
+
+	public void setGoalCost(final int goalCost) {
+		this.goalCost = goalCost;
 	}
 
 	@Override
@@ -127,15 +166,19 @@ public class Node {
 		StringBuilder sB = new StringBuilder();
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				sB.append(board[i][j] == 0 ? ' ' : board[i][j])
-				  .append(j == SIZE - 1 ? '\n' : ' ');
+				sB.append(board[i][j])
+				  .append(' ');
 			}
 		}
-		sB.append(moveDirection)
-		  .append(" cost: ")
-		  .append(cost)
-		  .append("total cost: ")
-		  .append(totalCost);
+		sB.append('\n').append(moveDirection);
+		if (evaluationCost != 0 || pathCost != 0 || goalCost != 0) { // if informed #TODO boolean informed?
+			sB.append("evaluationCost: ")
+			  .append(evaluationCost)
+			  .append(" pathCost: ")
+			  .append(pathCost)
+			  .append(" goalCost: ")
+			  .append(goalCost);
+		}
 		return sB.toString();
 	}
 

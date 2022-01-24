@@ -5,7 +5,7 @@ import java.awt.*;
 import static com.wordpress.brancodes.main.Data.SIZE;
 
 public enum Move {
-	UP(-1, 0), RIGHT(0, 1), DOWN(1, 0), LEFT(0, -1);
+	UP(1, 0), RIGHT(0, -1), DOWN(-1, 0, UP), LEFT(0, 1, RIGHT);
 
 	// the location of the piece moving from the empty tile
 	final int rowDiff;
@@ -17,11 +17,10 @@ public enum Move {
 		this.colDiff = colDiff;
 	}
 
-	static {
-		UP.opposite = DOWN;
-		RIGHT.opposite = LEFT;
-		DOWN.opposite = UP;
-		LEFT.opposite = RIGHT;
+	Move(int rowDiff, int colDiff, Move opposite) {
+		this.rowDiff = rowDiff;
+		this.colDiff = colDiff;
+		opposite.opposite = this;
 	}
 
 	/**
@@ -42,6 +41,11 @@ public enum Move {
 	 */
 	private boolean inBounds(int index) {
 		return index >= 0 && index < SIZE;
+	}
+
+	@Override
+	public String toString() {
+		return name();
 	}
 
 }
