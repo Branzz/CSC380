@@ -11,12 +11,6 @@ public class UninformedSearcher extends Searcher {
 
 	private final BiConsumer<Deque<Node>, Stream<Node>> nodeQueuer; // how to place node in queue
 
-	// public UninformedSearcher(String alias, BiConsumer<Deque<Node>, Stream<Node>> nodeQueuer) {
-	// 	super(alias);
-	// 	this.nodeQueuer = nodeQueuer;
-	// 	nodeQueue = new ArrayDeque<>();
-	// }
-
 	public UninformedSearcher(String alias, BiConsumer<Deque<Node>, Node> nodeQueuer) {
 		super(alias);
 		this.nodeQueuer = (deque, nodes) -> nodes.forEach(node -> nodeQueuer.accept(deque, node));

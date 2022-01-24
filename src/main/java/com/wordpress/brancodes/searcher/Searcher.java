@@ -39,6 +39,8 @@ public abstract class Searcher {
 				space = nodeQueue.size();
 			time++;
 		} while (!top.isGoal());
+		if (Data.PRINT_NODES)
+			System.out.println(top);
 		nodeHistory.clear();
 		nodeQueue.clear();
 		return new SearchStats(top.getDepth(), top.getTileValue(), time, space);

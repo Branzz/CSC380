@@ -1,9 +1,7 @@
 package com.wordpress.brancodes.main;
 
 import com.wordpress.brancodes.node.Node;
-import com.wordpress.brancodes.searcher.InformedSearcher;
-import com.wordpress.brancodes.searcher.Searcher;
-import com.wordpress.brancodes.searcher.UninformedSearcher;
+import com.wordpress.brancodes.searcher.*;
 
 import java.util.Deque;
 import java.util.List;
@@ -15,30 +13,35 @@ public class Main {
 
 	public static void main(String[] args) {
 
+//		printSearch(BOARD_CONFIGS[1], new UninformedSearcher("BFS", Deque::addFirst));
+
 		final List<Searcher> searchers = List.of(
 				new UninformedSearcher("BFS", Deque::addFirst),
 				new UninformedSearcher("DFS", Deque::addLast),
-				new UninformedSearcher("UCS", Deque::add),
-				//					         h(n)						f(n)
-				new InformedSearcher("GBF",  Node::misplacedTiles,		Node::heuristicFunction), // f(n) = h(n)
-				new InformedSearcher("A*h1", Node::misplacedTiles,		node -> node.costFunction() + node.heuristicFunction()), // f(n) = g(n) + h(n)
-				new InformedSearcher("A*h2", Node::manhattanSum,		node -> node.costFunction() + node.heuristicFunction()),
-				new InformedSearcher("A*h3", Node::manhattanSumByValue,	node -> node.costFunction() + node.heuristicFunction())
+				new SortedUninformedSearcher("UCS", Node::costFunction),
+				new InformedSearcher("GBF",  Node::misplacedTiles, Node::heuristicFunction), // f(n) = h(n)
+				new InformedSearcher("A*h1", Node::misplacedTiles), // default f(n) is g(n) + h(n)
+				new InformedSearcher("A*h2", Node::manhattanSum),
+				new InformedSearcher("A*h3", Node::manhattanSumByValue)
 		);
 
-		System.out.println("     length  cost  time space");
 		for (int i = 0; i < BOARD_CONFIGS.length; i++) {
-			System.out.print(BOARD_DIFFICULTIES[i] + ":\n");
+			System.out.println("           " + BOARD_DIFFICULTIES[i]);
+			System.out.println("ALG  length cost time  space");
 			for (final Searcher searcher : searchers) {
-				StringBuilder sB = new StringBuilder();
-				String searcherAlias = searcher.getAlias();
-				sB.append(searcherAlias)
-				  .append(":")
-				  .append(" ".repeat(4 - searcherAlias.length()))
-				  .append(searcher.search(BOARD_CONFIGS[i]));
-				System.out.println(sB);
+				printSearch(BOARD_CONFIGS[i], searcher);
 			}
 		}
+	}
+
+	private static void printSearch(final int[][] board, final Searcher searcher) {
+		StringBuilder sB = new StringBuilder();
+		String searcherAlias = searcher.getAlias();
+		sB.append(searcherAlias)
+		  .append(":")
+		  .append(" ".repeat(4 - searcherAlias.length()))
+		  .append(searcher.search(board));
+		System.out.println(sB);
 	}
 
 }

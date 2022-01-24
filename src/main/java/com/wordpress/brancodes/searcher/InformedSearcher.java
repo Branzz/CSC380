@@ -21,6 +21,13 @@ public class InformedSearcher extends Searcher {
 		nodeQueue = new PriorityQueue<>(Comparator.comparing(Node::evaluationFunction));
 	}
 
+	/**
+	 * A* shortcut constructor
+	 */
+	public InformedSearcher(String alias, final Function<Node, Integer> heuristicFunction) {
+		this(alias, heuristicFunction, node -> node.costFunction() + node.heuristicFunction());
+	}
+
 	@Override
 	protected void queueNodes(final Stream<Node> children) {
 		children.peek(n -> n.setGoalCost(heuristicFunction.apply(n)))

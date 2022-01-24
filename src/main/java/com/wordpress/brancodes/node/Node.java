@@ -8,7 +8,7 @@ import java.util.List;
 import static com.wordpress.brancodes.main.Data.*;
 import static java.lang.Math.abs;
 
-public class Node implements Heuristic {
+public class Node {
 
 	private final Move moveDirection; // move it took to get to this node
 	private final int[][] board; // the state
@@ -24,6 +24,7 @@ public class Node implements Heuristic {
 		this.moveDirection = moveDirection;
 		this.depth = depth;
 		this.movedTileValue = movedTileValue;
+		goalCost = -1;
 		zero = getZero();
 	}
 
@@ -32,6 +33,8 @@ public class Node implements Heuristic {
 	 * @return the expansion
 	 */
 	public List<Node> expand() {
+		if (isExpanded())
+			return children;
 		children = new ArrayList<>(4); // one index for each direction
 		for (int i = 0; i < Move.values().length; i++) {
 			Move move = Move.values()[i];
@@ -101,14 +104,6 @@ public class Node implements Heuristic {
 		return manhattanSum() * movedTileValue;
 	}
 
-	public int[][] getBoard() {
-		return board;
-	}
-
-	public Node getParent() {
-		return parent;
-	}
-
 	public int getDepth() {
 		return depth;
 	}
@@ -117,32 +112,24 @@ public class Node implements Heuristic {
 		return movedTileValue;
 	}
 
-	public List<Node> getChildren() {
-		return children;
-	}
-
 	public boolean isExpanded() {
 		return children != null;
 	}
 
 	private int evaluationCost;
-	private int pathCost;
 	private int goalCost;
 
 	/** f(n) */
-	@Override
 	public int evaluationFunction() {
 		return evaluationCost;
 	}
 
 	/** g(n) */
-	@Override
 	public int costFunction() {
 		return getTileValue();
 	}
 
 	/** h(n) */
-	@Override
 	public int heuristicFunction() {
 		return goalCost;
 	}
@@ -151,10 +138,6 @@ public class Node implements Heuristic {
 
 	public void setEvaluationCost(final int evaluationCost) {
 		this.evaluationCost = evaluationCost;
-	}
-
-	public void setPathCost(final int pathCost) {
-		this.pathCost = pathCost;
 	}
 
 	public void setGoalCost(final int goalCost) {
@@ -171,13 +154,13 @@ public class Node implements Heuristic {
 			}
 		}
 		sB.append('\n').append(moveDirection);
-		if (evaluationCost != 0 || pathCost != 0 || goalCost != 0) { // if informed #TODO boolean informed?
-			sB.append("evaluationCost: ")
-			  .append(evaluationCost)
+		if (heuristicFunction() != -1) { // if informed
+			sB.append(" evaluationCost: ")
+			  .append(evaluationFunction())
 			  .append(" pathCost: ")
-			  .append(pathCost)
+			  .append(costFunction())
 			  .append(" goalCost: ")
-			  .append(goalCost);
+			  .append(heuristicFunction());
 		}
 		return sB.toString();
 	}
