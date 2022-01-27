@@ -15,6 +15,12 @@ public class Main {
 
 	public static void main(String[] args) {
 
+	//	EightsPuzzleTester();
+
+
+	}
+
+	private static void EightsPuzzleTester() {
 		final List<Searcher<EightsPuzzleNode>> searchers = List.of(
 				new UninformedSearcher<>("BFS", Deque::addFirst),
 				new UninformedSearcher<>("DFS", Deque::addLast),
@@ -29,21 +35,25 @@ public class Main {
 			System.out.println("           " + BOARD_DIFFICULTIES[i]);
 			System.out.println("ALG  length cost time  space");
 			for (final Searcher<EightsPuzzleNode> searcher : searchers) {
-				printSearch(searcher, new EightsPuzzleNode(BOARD_CONFIGS[i], null, null, 0, 0));
+				printSearch(searcher, new EightsPuzzleNode(BOARD_CONFIGS[i]));
 			}
 		}
-
 	}
 
-	private static <T extends Node> void printSearch(final Searcher<T> searcher, final T root) { // TODO boolean print options
+	private static <T extends Node> void printSearch(final Searcher<T> searcher, final T root) {
+		printSearch(searcher, root, false);
+	}
+
+	private static <T extends Node> void printSearch(final Searcher<T> searcher, final T root, final boolean printStack) {
 		StringBuilder sB = new StringBuilder();
 		String searcherAlias = searcher.getAlias();
 		final SearchStats searchStats = searcher.search(root);
 		sB.append(searcherAlias)
 		  .append(":")
 		  .append(" ".repeat(4 - searcherAlias.length()))
-		  .append(searchStats)
-		  .append(searchStats.solution().stackTrace().stream().map(Node::toString).collect(Collectors.joining("\n")));
+		  .append(searchStats);
+		if (printStack)
+			sB.append('\n').append(searchStats.solution().stackTrace().stream().map(Node::toString).collect(Collectors.joining("\n")));
 		System.out.println(sB);
 	}
 

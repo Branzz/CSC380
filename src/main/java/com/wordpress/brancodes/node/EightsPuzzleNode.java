@@ -11,6 +11,7 @@ import static java.lang.Math.abs;
 
 public class EightsPuzzleNode extends Node {
 
+	private final int depth;
 	private final Move moveDirection; // move it took to get to this node
 	private final int[][] board; // the state
 	private final EightsPuzzleNode parent;
@@ -21,8 +22,16 @@ public class EightsPuzzleNode extends Node {
 	private int evaluationCost;
 	private int goalCost;
 
+	/**
+	 * default root node constructor
+	 */
+	public EightsPuzzleNode(int[][] board) {
+		this(board, null, null, 0, 0);
+	}
+
 	public EightsPuzzleNode(int[][] board, EightsPuzzleNode parent, Move moveDirection, int depth, int movedTileValue) {
-		super(depth);
+		super();
+		this.depth = depth;
 		this.board = board;
 		this.parent = parent;
 		this.moveDirection = moveDirection;
@@ -35,7 +44,7 @@ public class EightsPuzzleNode extends Node {
 		if (isExpanded())
 			return children;
 		children = new ArrayList<>(4); // one index for each direction
-		for (int i = 0; i < Move.values().length; i++) { // TODO: extract this section into abstract method /// move children field up to Node
+		for (int i = 0; i < Move.values().length; i++) {
 			Move move = Move.values()[i];
 			if ((moveDirection == null || move != moveDirection.opposite) // so that it doesn't search backwards up the tree
 				&& move.inBounds(zero)) { // can't move out of bounds pieces in
@@ -105,13 +114,13 @@ public class EightsPuzzleNode extends Node {
 	}
 
 	@Override
-	public EightsPuzzleNode getParent() {
-		return parent;
+	public int getDepth() {
+		return depth;
 	}
 
 	@Override
-	public int getDepth() {
-		return depth;
+	public EightsPuzzleNode getParent() {
+		return parent;
 	}
 
 	public int getTileValue() {
@@ -182,6 +191,52 @@ public class EightsPuzzleNode extends Node {
 			return Arrays.deepHashCode(board);
 		else
 			return getBoardAsInt();
+	}
+
+	enum Move {
+		UP(1, 0), RIGHT(0, -1), DOWN(-1, 0, UP), LEFT(0, 1, RIGHT);
+
+		// the location of the piece moving from the empty tile
+		final int rowDiff;
+		final int colDiff;
+		Move opposite;
+
+		Move(int rowDiff, int colDiff) {
+			this.rowDiff = rowDiff;
+			this.colDiff = colDiff;
+		}
+
+		Move(int rowDiff, int colDiff, Move opposite) {
+			this.rowDiff = rowDiff;
+			this.colDiff = colDiff;
+			opposite.opposite = this;
+		}
+
+		/**
+		 * example:
+		 *  0X
+		 *  00
+		 * X (0, 1) can't move UP (row = (0) - 1) < 0; nor RIGHT (col = (1) + 1) >= 2
+		 *
+		 * @return whether the point lies on the grid when this move is applied.
+		 */
+		public boolean inBounds(Point point) {
+			return inBounds(point.x + rowDiff) && inBounds(point.y + colDiff);
+		}
+
+		/**
+		 * @return if the pos along the row or column is within the valid range;
+		 * ArrayIndexOutOfBoundsException would be thrown otherwise.
+		 */
+		private boolean inBounds(int index) {
+			return index >= 0 && index < SIZE;
+		}
+
+		@Override
+		public String toString() {
+			return name();
+		}
+
 	}
 
 }

@@ -7,10 +7,8 @@ import java.util.Queue;
 
 public abstract class Node implements Evaluable {
 
-	protected final int depth;
 
-	public Node(int depth) {
-		this.depth = depth;
+	public Node() {
 	}
 
 	/**
@@ -21,19 +19,19 @@ public abstract class Node implements Evaluable {
 	 */
 	public abstract List<? extends Node> expand();
 
+	public abstract boolean isExpanded();
+
 	public abstract boolean isGoal();
 
 	public abstract int getDepth();
 
 	public abstract Node getParent();
 
-	public abstract boolean isExpanded();
-
 	public Queue<Node> stackTrace() {
-		Deque<Node> nodeStack = new ArrayDeque<>(depth);
+		Deque<Node> nodeStack = new ArrayDeque<>(getDepth());
 		Node current = this;
 		while (current != null) {
-			nodeStack.addLast(current);
+			nodeStack.addFirst(current);
 			current = current.getParent();
 		}
 		return nodeStack;
