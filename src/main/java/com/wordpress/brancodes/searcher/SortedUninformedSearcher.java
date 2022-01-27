@@ -7,15 +7,15 @@ import java.util.PriorityQueue;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class SortedUninformedSearcher extends Searcher {
+public class SortedUninformedSearcher<T extends Node> extends Searcher<T> {
 
-	public SortedUninformedSearcher(String alias, Function<Node, Integer> sortingFunction) {
+	public SortedUninformedSearcher(String alias, Function<T, Integer> sortingFunction) {
 		super(alias);
 		nodeQueue = new PriorityQueue<>(Comparator.comparing(sortingFunction));
 	}
 
 	@Override
-	protected void queueNodes(final Stream<Node> children) {
+	protected void queueNodes(final Stream<T> children) {
 		children.forEach(nodeQueue::add);
 	}
 

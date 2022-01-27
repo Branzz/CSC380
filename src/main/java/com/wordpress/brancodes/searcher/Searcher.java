@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.stream.Stream;
 
-public abstract class Searcher {
+public abstract class Searcher<T extends Node> {
 
-	protected Queue<Node> nodeQueue;
+	protected Queue<T> nodeQueue; // to be instantiated by child
 	protected String alias;
-	private HashSet<Node> nodeHistory;
+	private HashSet<T> nodeHistory;
 
 	private Searcher() { }
 
@@ -21,39 +21,38 @@ public abstract class Searcher {
 		nodeHistory = new HashSet<>();
 	}
 
-	public final SearchStats search(int[][] board) {
-		return search(new Node(board, null, null, 0, 0));
-	}
-
-	public final SearchStats search(final Node root) {
+	public final SearchStats search(final T root) {
 		int time = 0;
 		int space = 0;
-		Node top = root;
+		T top = root;
 		do {
 			if (Data.PRINT_NODES)
 				System.out.println(top);
- 			queueNodes(top.expand().stream().filter(nodeHistory::add));
-			// nodeQueuer.accept(nodeQueue, );
+ 			queueNodes(top.expand().stream().map(node -> (T) node).filter(nodeHistory::add));
 			top = nodeQueue.poll();
 			if (nodeQueue.size() > space)
 				space = nodeQueue.size();
 			time++;
+			if (top == null) {
+				System.out.println("The solution couldn't be found");
+				return new SearchStats(null, time, space);
+			}
 		} while (!top.isGoal());
 		if (Data.PRINT_NODES)
 			System.out.println(top);
 		nodeHistory.clear();
 		nodeQueue.clear();
-		return new SearchStats(top.getDepth(), top.getTileValue(), time, space);
+		return new SearchStats(top, time, space);
 	}
 
-	protected final boolean isRepeat(final Node node) {
+	protected final boolean isRepeat(final T node) {
 		return nodeHistory.contains(node);
 	}
 
 	/**
 	 * @param children the children from expansion of popped node
 	 */
-	protected abstract void queueNodes(final Stream<Node> children);
+	protected abstract void queueNodes(final Stream<T> children);
 
 	public String getAlias() {
 		return alias;
