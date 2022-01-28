@@ -1,6 +1,5 @@
 package com.wordpress.brancodes.searcher;
 
-import com.wordpress.brancodes.main.Data;
 import com.wordpress.brancodes.node.Node;
 
 import java.util.HashSet;
@@ -8,6 +7,8 @@ import java.util.Queue;
 import java.util.stream.Stream;
 
 public abstract class Searcher<T extends Node> {
+
+	final static boolean PRINT_NODES = false;
 
 	protected Queue<T> nodeQueue; // to be instantiated by child
 	protected String alias;
@@ -26,7 +27,7 @@ public abstract class Searcher<T extends Node> {
 		int space = 0;
 		T top = root;
 		do {
-			if (Data.PRINT_NODES)
+			if (PRINT_NODES)
 				System.out.println(top);
  			queueNodes(top.expand().stream().map(node -> (T) node).filter(nodeHistory::add));
 			top = nodeQueue.poll();
@@ -38,7 +39,7 @@ public abstract class Searcher<T extends Node> {
 				return new SearchStats(null, time, space);
 			}
 		} while (!top.isGoal());
-		if (Data.PRINT_NODES)
+		if (PRINT_NODES)
 			System.out.println(top);
 		nodeHistory.clear();
 		nodeQueue.clear();

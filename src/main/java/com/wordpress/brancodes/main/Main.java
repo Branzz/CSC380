@@ -8,19 +8,32 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.wordpress.brancodes.main.Data.BOARD_CONFIGS;
-import static com.wordpress.brancodes.main.Data.BOARD_DIFFICULTIES;
-
 public class Main {
 
 	public static void main(String[] args) {
 
-	//	EightsPuzzleTester();
-
+		eightsPuzzleTester();
+		// queensPuzzleTester();
+		// other games?
 
 	}
 
-	private static void EightsPuzzleTester() {
+	private static void eightsPuzzleTester() {
+		final int[][][] BOARD_CONFIGS = new int[][][] {
+				{{ 1, 3, 4 },
+				 { 8, 6, 2 },
+				 { 7, 0, 5 }},
+				{{ 2, 8, 1 },
+				 { 0, 4, 3 },
+				 { 7, 6, 5 }},
+				{{ 5, 6, 7 },
+				 { 4, 0, 8 },
+				 { 3, 2, 1 }}
+		};
+
+		final String[] BOARD_DIFFICULTIES = new String[]
+				{ "easy", "medium", "hard" };
+
 		final List<Searcher<EightsPuzzleNode>> searchers = List.of(
 				new UninformedSearcher<>("BFS", Deque::addFirst),
 				new UninformedSearcher<>("DFS", Deque::addLast),

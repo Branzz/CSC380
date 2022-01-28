@@ -5,11 +5,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wordpress.brancodes.main.Data.*;
-import static com.wordpress.brancodes.main.Data.SIZE;
 import static java.lang.Math.abs;
 
 public class EightsPuzzleNode extends Node {
+
+	public final static int SIZE = 3;
+
+	final static int[][] GOAL = new int[][] {
+			{ 1, 2, 3 },
+			{ 8, 0, 4 },
+			{ 7, 6, 5 }
+	};
+
+	final static Point[] GOAL_POINTS = new Point[SIZE * SIZE];
+
+	static {
+		for (int i = 0; i < SIZE; i++)
+			for (int j = 0; j < SIZE; j++)
+				GOAL_POINTS[GOAL[i][j]] = new Point(j, i); // p[i] is where i is on GOAL
+	}
 
 	private final int depth;
 	private final Move moveDirection; // move it took to get to this node
