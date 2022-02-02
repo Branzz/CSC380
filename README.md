@@ -1,4 +1,4 @@
-# CSC380
+# CSC380 AI Searching
 Airtificial Intelligence Searching Agents
 
 When worked on: January 2022
